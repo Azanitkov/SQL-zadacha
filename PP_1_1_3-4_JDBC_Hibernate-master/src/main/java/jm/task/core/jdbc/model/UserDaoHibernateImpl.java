@@ -1,9 +1,12 @@
-package jm.task.core.jdbc.dao;
+package jm.task.core.jdbc.model;
 
-import jm.task.core.jdbc.model.User;
+import jm.task.core.jdbc.dao.UserDao;
+
+
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
+
     @Override
     public void createUsersTable() {
 
