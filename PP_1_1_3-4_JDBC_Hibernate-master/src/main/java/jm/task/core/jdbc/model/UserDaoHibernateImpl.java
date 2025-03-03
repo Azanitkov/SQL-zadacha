@@ -15,6 +15,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
+       Transaction transaction = null;
         String sql = "CREATE TABLE IF NOT EXISTS users (" +
                 "id BIGINT PRIMARY KEY AUTO_INCREMENT, " +
                 "name VARCHAR(50) NOT NULL, " +
@@ -22,45 +23,57 @@ public class UserDaoHibernateImpl implements UserDao {
                 "age TINYINT NOT NULL" +
                 ")";
         try (Session session = Util.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
             session.createNativeQuery(sql).executeUpdate();
             transaction.commit();
             System.out.println("Таблица создана!");
         } catch (Exception e) {
+            if (transaction != null){
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
     public void dropUsersTable() {
+       Transaction transaction = null;
         String sql = "DROP TABLE IF EXISTS users";
         try (Session session = Util.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
             session.createNativeQuery(sql).executeUpdate();
             transaction.commit();
             System.out.println("Таблица Удалена!");
         } catch (Exception e) {
+            if (transaction != null){
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
+       Transaction transaction = null;
         User user = new User(name, lastName, age);
         try (Session session = Util.getSessionFactory().openSession()){
-            Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
             session.save(user);
             transaction.commit();
             System.out.println("User с именем [" + name + "] Добавлен в БД!");
         }catch (Exception e){
+            if (transaction != null){
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
     public void removeUserById(long id) {
+       Transaction transaction  = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
             User user = session.get(User.class, id);
 
             if (user != null) {
@@ -72,29 +85,40 @@ public class UserDaoHibernateImpl implements UserDao {
 
             transaction.commit();
         } catch (Exception e) {
+            if (transaction != null){
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
 
     @Override
     public List<User> getAllUsers() {
+       Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()){
             return session.createQuery("FROM User", User.class).list();
         }catch (Exception e){
             e.printStackTrace();
+            if (transaction != null){
+                transaction.rollback();
+            }
         }
         return null;
     }
 
     @Override
     public void cleanUsersTable() {
+       Transaction transaction = null;
         String sql = "TRUNCATE TABLE users";
         try (Session session = Util.getSessionFactory().openSession()){
-            Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
             session.createNativeQuery(sql).executeUpdate();
             transaction.commit();
             System.out.println("БД очищена!");
         }catch (Exception e){
+            if (transaction != null){
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
